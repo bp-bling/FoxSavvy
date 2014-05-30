@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?xml-stylesheet href="chrome://foxsavvy/skin/overlay.css" type="text/css"?>
+<!DOCTYPE overlay SYSTEM "chrome://foxsavvy/locale/overlay.dtd">
+<overlay id="foxsavvy-overlay" xmlns="http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul">
+  <script src="ff-overlay.js"/>
+  <stringbundleset id="stringbundleset">
+    <stringbundle id="foxsavvy-strings" src="chrome://foxsavvy/locale/overlay.properties"/>
+  </stringbundleset>
+  <toolbox id="navigator-toolbox">
+    <toolbar class="chromeclass-toolbar" toolbarname="&foxsavvyToolbar.name;" customizable="true" id="foxsavvy-toolbar">
+      <label value="&foxsavvyToolbar.label;"/>
+    </toolbar>
+  </toolbox>
+</overlay>

@@ -1,0 +1,4 @@
+content   foxsavvy                 chrome/content/
+skin      foxsavvy   classic/1.0   chrome/skin/
+locale    foxsavvy   en-US         chrome/locale/en-US/
+overlay	chrome://browser/content/browser.xul	chrome://foxsavvy/content/ff-overlay.xul
