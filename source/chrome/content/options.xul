@@ -1,29 +1,16 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<?xml-stylesheet href="chrome://global/skin/" type="text/css"?>
-<!DOCTYPE prefwindow SYSTEM "chrome://foxsavvy/locale/options.dtd">
-<prefwindow id="foxsavvy-preferences" xmlns="http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul" title="&prefwindow.title;">
-  <prefpane id="pane1" label="&pane1.title;">
-    <preferences>
-      <preference id="APIKey" name="extensions.foxsavvy.APIKey" type="string"/>
-      <preference id="ShowPeak" name="extensions.foxsavvy.ShowPeak" type="bool"/>
-      <preference id="ShowDown" name="extensions.foxsavvy.ShowDown" type="bool"/>
-      <preference id="ShowDownPredicted" name="extensions.foxsavvy.ShowDownPredicted" type="bool"/>
-      <preference id="ShowUp" name="extensions.foxsavvy.ShowUp" type="bool"/>
-      <preference id="ShowUpPredicted" name="extensions.foxsavvy.ShowUpPredicted" type="bool"/>
-      <preference id="ShowTotal" name="extensions.foxsavvy.ShowTotal" type="bool"/>
-      <preference id="ShowTotalPredicted" name="extensions.foxsavvy.ShowTotalPredicted" type="bool"/>
-      <preference id="ShowISP" name="extensions.foxsavvy.ShowISP" type="bool"/>
-      <preference id="ShowStatusbar" name="extensions.foxsavvy.ShowStatusbar" type="bool"/>
-    </preferences>
-    <label accesskey="&APIKey.accesskey;" control="txtAPIKey">&APIKey.label;</label><textbox id="txtAPIKey" preference="APIKey"/>
-    <checkbox id="chkShowDown" preference="ShowDown" label="&ShowDown.label;"/>
-    <checkbox id="chkShowDownPredicted" preference="ShowDownPredicted" label="&ShowDownPredicted.label;"/>
-    <checkbox id="chkShowUp" preference="ShowUp" label="&ShowUp.label;"/>
-    <checkbox id="chkShowUpPredicted" preference="ShowUpPredicted" label="&ShowUpPredicted.label;"/>
-    <checkbox id="chkShowTotal" preference="ShowTotal" label="&ShowTotal.label;"/>
-    <checkbox id="chkShowTotalPredicted" preference="ShowTotalPredicted" label="&ShowTotalPredicted.label;"/> 
-    <checkbox id="chkShowPeak" preference="ShowPeak" label="&ShowPeak.label;"/>
-    <checkbox id="chkShowISP" preference="ShowISP" label="&ShowISP.label;"/>
-    <checkbox id="chkShowStatusbar" preference="ShowStatusbar" label="&ShowStatusbar.label;"/>
-  </prefpane>
-</prefwindow>
+<?xml version="1.0"?>
+ 
+<!DOCTYPE vbox SYSTEM "chrome://foxsavvy/locale/options.dtd">
+ 
+<vbox xmlns="http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul">
+  <setting pref="extensions.foxsavvy.APIKey" type="string" title="&APIKey.label;"/>
+  <setting pref="extensions.foxsavvy.ShowDown" type="bool" title="&ShowDown.label;"/>
+  <setting pref="extensions.foxsavvy.ShowDownPredicted" type="bool" title="&ShowDownPredicted.label;"/>
+  <setting pref="extensions.foxsavvy.ShowUp" type="bool" title="&ShowUp.label;"/>
+  <setting pref="extensions.foxsavvy.ShowUpPredicted" type="bool" title="&ShowUpPredicted.label;"/>
+  <setting pref="extensions.foxsavvy.ShowTotal" type="bool" title="&ShowTotal.label;"/>
+  <setting pref="extensions.foxsavvy.ShowTotalPredicted" type="bool" title="&ShowTotalPredicted.label;"/>
+  <setting pref="extensions.foxsavvy.ShowPeak" type="bool" title="&ShowPeak.label;"/>
+  <setting pref="extensions.foxsavvy.ShowISP" type="bool" title="&ShowISP.label;"/>
+  <setting pref="extensions.foxsavvy.ShowStatusbar" type="bool" title="&ShowStatusbar.label;"/>
+</vbox>

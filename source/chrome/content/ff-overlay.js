@@ -45,51 +45,58 @@ var FoxSavvy = function () {
      if (topic != "nsPref:changed") { return; }
      
      clearTimeout(FoxSavvyTimer);
-     this.RefreshUsage();
+     this.RefreshUsage(data === "APIKey");
   };
   
-  this.RefreshUsage = function() {
+  this.RefreshUsage = function(requestFromISP) {
     // Get the Username / API Key preference
     var prefManager = Components.classes['@mozilla.org/preferences-service;1'].getService(Components.interfaces.nsIPrefBranch);
     this.APIKey = prefManager.getCharPref('extensions.foxsavvy.APIKey').trim();
 
-    this.Usage = new UsageData();
+    if (requestFromISP) {
+        this.Usage = new UsageData();
 
-    // Check which ISP we're requesting usage for -- order counts! If one does't match it falls through to the next, teksavvy is the catchall.
-    if (/^[a-z0-9_\-\.]{3,}@(data\.com|ebox\.com|electronicbox\.net|highspeed\.com|internet\.com|ppp\.com|www\.com)$/.test(this.APIKey)) { 
-        this.ISP = 'Electronicbox Residential DSL';
-    } else if (/^[a-z0-9_\-\.]{3,}@ebox-business\.com$/.test(this.APIKey)) { 
-        this.ISP = 'Electronicbox Business DSL';
-    } else if (/^vl[a-z]{6}$/.test(this.APIKey)) {
-        this.ISP = 'Videotron TPIA';
-    } else if (/^[1-9]\d{4}$/.test(this.APIKey)) {
-        // Valid logins are [a-z0-9]{3,20}@caneris (no .com on the end), but usage is retrieved by 5 digit account number.
-        this.ISP = 'Caneris DSL'; 
-    } else if (/^[A-Z0-9]{7}[A-F0-9]{11}D@(start\.ca)$/.test(this.APIKey)) {
-        this.ISP = 'Start DSL';
-        this.RefreshUsageStart();
-    } else if (/^[A-Z0-9]{7}[A-F0-9]{11}C@(start\.ca)$/.test(this.APIKey)) {
-        this.ISP = 'Start Cable';
-        this.RefreshUsageStart();
-    } else if (/^[A-Z0-9]{7}[A-F0-9]{11}W@(start\.ca)$/.test(this.APIKey)) {
-        this.ISP = 'Start Wireless';
-        this.RefreshUsageStart();
-    } else if (/^[A-Z0-9]{7}[A-F0-9]{11}D@(logins\.ca)$/.test(this.APIKey)) {
-        this.ISP = 'Start Wholesale DSL';
-        this.RefreshUsageStart();
-    } else if (/^[A-Z0-9]{7}[A-F0-9]{11}C@(logins\.ca)$/.test(this.APIKey)) {
-        this.ISP = 'Start Wholesale Cable';
-        this.RefreshUsageStart();
-    } else if (/^[A-Z0-9]{7}[A-F0-9]{11}W@(logins\.ca)$/.test(this.APIKey)) {
-        this.ISP = 'Start Wholesale Wireless';
-        this.RefreshUsageStart();
-    } else if (/^([0-9A-F]{32})(|@teksavvy.com)(|\+[0-9]{1,4})$/.test(this.APIKey)) {
-        this.ISP = 'TekSavvy';
-        this.RefreshUsageTekSavvy();
-    } else {
-        this.ISP = 'Unknown';
-        var promptService = Components.classes['@mozilla.org/embedcomp/prompt-service;1'].getService(Components.interfaces.nsIPromptService);
-        promptService.alert(window, 'FoxSavvy', 'Your Username / API Key was not recognized:\n' + this.APIKey);
+        // Check which ISP we're requesting usage for -- order counts! If one does't match it falls through to the next, teksavvy is the catchall.
+        if (/^[a-z0-9_\-\.]{3,}@(data\.com|ebox\.com|electronicbox\.net|highspeed\.com|internet\.com|ppp\.com|www\.com)$/.test(this.APIKey)) { 
+            this.ISP = 'Electronicbox Residential DSL';
+        } else if (/^[a-z0-9_\-\.]{3,}@ebox-business\.com$/.test(this.APIKey)) { 
+            this.ISP = 'Electronicbox Business DSL';
+        } else if (/^vl[a-z]{6}$/.test(this.APIKey)) {
+            this.ISP = 'Videotron TPIA';
+        } else if (/^[1-9]\d{4}$/.test(this.APIKey)) {
+            // Valid logins are [a-z0-9]{3,20}@caneris (no .com on the end), but usage is retrieved by 5 digit account number.
+            this.ISP = 'Caneris DSL'; 
+        } else if (/^[A-Z0-9]{7}[A-F0-9]{11}D@(start\.ca)$/.test(this.APIKey)) {
+            this.ISP = 'Start DSL';
+            this.RefreshUsageStart();
+        } else if (/^[A-Z0-9]{7}[A-F0-9]{11}C@(start\.ca)$/.test(this.APIKey)) {
+            this.ISP = 'Start Cable';
+            this.RefreshUsageStart();
+        } else if (/^[A-Z0-9]{7}[A-F0-9]{11}W@(start\.ca)$/.test(this.APIKey)) {
+            this.ISP = 'Start Wireless';
+            this.RefreshUsageStart();
+        } else if (/^[A-Z0-9]{7}[A-F0-9]{11}D@(logins\.ca)$/.test(this.APIKey)) {
+            this.ISP = 'Start Wholesale DSL';
+            this.RefreshUsageStart();
+        } else if (/^[A-Z0-9]{7}[A-F0-9]{11}C@(logins\.ca)$/.test(this.APIKey)) {
+            this.ISP = 'Start Wholesale Cable';
+            this.RefreshUsageStart();
+        } else if (/^[A-Z0-9]{7}[A-F0-9]{11}W@(logins\.ca)$/.test(this.APIKey)) {
+            this.ISP = 'Start Wholesale Wireless';
+            this.RefreshUsageStart();
+        } else if (/^([0-9A-F]{32})(|@teksavvy.com)(|\+[0-9]{1,4})$/.test(this.APIKey)) {
+            this.ISP = 'TekSavvy';
+            this.RefreshUsageTekSavvy();
+        } else {
+            // TODO What happens if the user doesn't show the ISP?  They won't know there's a problem
+            // TODO Maybe force show the ISP on error?  Or hide the labels and show an error message?
+            // TODO Can't show a popup, because it'll show with every keypress in the API textbox
+            this.ISP = 'Invalid Username / API Key';
+        }
+
+        this.Usage.All.Down = this.Usage.Peak.Down + this.Usage.OffPeak.Down;
+        this.Usage.All.Total = this.Usage.Peak.Total + this.Usage.OffPeak.Total;
+        this.Usage.All.Up = this.Usage.Peak.Up + this.Usage.OffPeak.Up;  
     }
 
     // Update toolbar labels
@@ -104,10 +111,6 @@ var FoxSavvy = function () {
         document.getElementById('lblISPToolbar').value = this.ISP;
     } else {
         // Displaying All (Peak + Off-Peak) in labels
-        this.Usage.All.Down = this.Usage.Peak.Down + this.Usage.OffPeak.Down;
-        this.Usage.All.Total = this.Usage.Peak.Total + this.Usage.OffPeak.Total;
-        this.Usage.All.Up = this.Usage.Peak.Up + this.Usage.OffPeak.Up;  
-
         document.getElementById('lblDownToolbar').value = parseFloat(this.Usage.All.Down).toFixed(2) + ' GB';
         document.getElementById('lblDownPredictedToolbar').value = parseFloat(this.Usage.All.DownPredicted).toFixed(2) + ' GB';
         document.getElementById('lblUpToolbar').value = parseFloat(this.Usage.All.Up).toFixed(2) + ' GB';
@@ -146,8 +149,7 @@ var FoxSavvy = function () {
     document.getElementById('lblISPStatusbar').style.display = document.getElementById('lblISPToolbar').style.display;
     
     // TODO Maybe colour FoxSavvy label based on success?  Green is OK, Red is error?
-    
-    FoxSavvyTimer = setTimeout("foxsavvy.RefreshUsage();", 30 * 60 * 1000); // 30 minutes
+    FoxSavvyTimer = setTimeout("foxsavvy.RefreshUsage(true);", 30 * 60 * 1000); // 30 minutes
   };
   
   this.RefreshUsageStart = function() {
@@ -220,4 +222,4 @@ var foxsavvy = new FoxSavvy();
 
 window.addEventListener("load", function () { foxsavvy.onLoad(); }, false);
 
-FoxSavvyTimer = setTimeout("foxsavvy.RefreshUsage();", 1000);
+FoxSavvyTimer = setTimeout("foxsavvy.RefreshUsage(true);", 1000);

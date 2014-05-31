@@ -1,7 +1,4 @@
-<!ENTITY prefwindow.title "FoxSavvy preferences">
-<!ENTITY pane1.title "FoxSavvy preferences">
 <!ENTITY APIKey.label "Username / API Key">
-<!ENTITY APIKey.accesskey "A">
 <!ENTITY ShowDown.label "Show Download (D)">
 <!ENTITY ShowDownPredicted.label "Show Download Predicted (DP)">
 <!ENTITY ShowUp.label "Show Upload (U)">
