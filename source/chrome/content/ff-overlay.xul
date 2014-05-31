@@ -10,11 +10,20 @@
     <toolbar class="chromeclass-toolbar" toolbarname="&foxsavvyToolbar.name;" customizable="true" id="foxsavvy-toolbar">
       <label value="&foxsavvyToolbar.label;" style="color: red; font-weight: bold;"/>
       <label value="&foxsavvyToolbar.Current;" style="font-weight: bold;"/>
-      <label id="lblCurrentUsage" value="0 GB"/>
+      <label id="lblCurrentUsageToolbar" value="0 GB"/>
       <label value="&foxsavvyToolbar.Predicted;" style="font-weight: bold;"/>
-      <label id="lblPredictedUsage" value="0 GB"/>
+      <label id="lblPredictedUsageToolbar" value="0 GB"/>
       <label value="&foxsavvyToolbar.ISP;" style="font-weight: bold;"/>
-      <label id="lblISP" value="&foxsavvyToolbar.ISPText;"/>
+      <label id="lblISPToolbar" value="&foxsavvyToolbar.ISPText;"/>
     </toolbar>
   </toolbox>
+  <statusbar id="status-bar">
+      <label value="&foxsavvyToolbar.label;" style="color: red; font-weight: bold;"/>
+      <label value="&foxsavvyToolbar.Current;" style="font-weight: bold;"/>
+      <label id="lblCurrentUsageStatusbar" value="0 GB"/>
+      <label value="&foxsavvyToolbar.Predicted;" style="font-weight: bold;"/>
+      <label id="lblPredictedUsageStatusbar" value="0 GB"/>
+      <label value="&foxsavvyToolbar.ISP;" style="font-weight: bold;"/>
+      <label id="lblISPStatusbar" value="&foxsavvyToolbar.ISPText;"/>
+  </statusbar>
 </overlay>

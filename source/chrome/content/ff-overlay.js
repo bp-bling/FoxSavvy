@@ -94,9 +94,13 @@ var FoxSavvy = function () {
     that.Usage.All.Total = that.Usage.Peak.Total + that.Usage.OffPeak.Total;
     that.Usage.All.Up = that.Usage.Peak.Up + that.Usage.OffPeak.Up;  
     
-    document.getElementById('lblCurrentUsage').value = parseFloat(this.Usage.Peak.Down).toFixed(2) + ' GB';
-    document.getElementById('lblPredictedUsage').value = parseFloat(this.Usage.Peak.DownPredicted).toFixed(2) + ' GB';
-    document.getElementById('lblISP').value = this.ISP;
+    document.getElementById('lblCurrentUsageToolbar').value = parseFloat(this.Usage.Peak.Down).toFixed(2) + ' GB';
+    document.getElementById('lblPredictedUsageToolbar').value = parseFloat(this.Usage.Peak.DownPredicted).toFixed(2) + ' GB';
+    document.getElementById('lblISPToolbar').value = this.ISP;
+    
+    document.getElementById('lblCurrentUsageStatusbar').value = document.getElementById('lblCurrentUsageToolbar').value;
+    document.getElementById('lblPredictedUsageStatusbar').value = document.getElementById('lblPredictedUsageToolbar').value;
+    document.getElementById('lblISPStatusbar').value = document.getElementById('lblISPToolbar').value;
     
     FoxSavvyTimer = setTimeout("foxsavvy.RefreshUsage();", 30 * 60 * 1000); // 30 minutes
   };
