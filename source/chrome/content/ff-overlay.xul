@@ -10,11 +10,11 @@
     <toolbar class="chromeclass-toolbar" toolbarname="&foxsavvyToolbar.name;" customizable="true" id="foxsavvy-toolbar">
       <label value="&foxsavvyToolbar.label;" style="color: red; font-weight: bold;"/>
       <label value="&foxsavvyToolbar.Current;" style="font-weight: bold;"/>
-      <label value="0 GB" id="lblCurrentUsage"/>
+      <label id="lblCurrentUsage" value="0 GB"/>
       <label value="&foxsavvyToolbar.Predicted;" style="font-weight: bold;"/>
-      <label value="0 GB" id="lblPredictedUsage"/>
+      <label id="lblPredictedUsage" value="0 GB"/>
       <label value="&foxsavvyToolbar.ISP;" style="font-weight: bold;"/>
-      <label value="&foxsavvyToolbar.ISPText;" id="lblISP"/>
+      <label id="lblISP" value="&foxsavvyToolbar.ISPText;"/>
     </toolbar>
   </toolbox>
 </overlay>
