@@ -1,2 +1,6 @@
 <!ENTITY foxsavvyToolbar.name  "FoxSavvy">
 <!ENTITY foxsavvyToolbar.label "FoxSavvy">
+<!ENTITY foxsavvyToolbar.ISP "ISP:">
+<!ENTITY foxsavvyToolbar.ISPText "Not configured (specify in FoxSavvy Options)">
+<!ENTITY foxsavvyToolbar.Current "Current:">
+<!ENTITY foxsavvyToolbar.Predicted "Predicted:">
