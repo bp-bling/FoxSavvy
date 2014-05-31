@@ -5,7 +5,25 @@
   <prefpane id="pane1" label="&pane1.title;">
     <preferences>
       <preference id="APIKey" name="extensions.foxsavvy.APIKey" type="string"/>
+      <preference id="ShowPeak" name="extensions.foxsavvy.ShowPeak" type="bool"/>
+      <preference id="ShowDown" name="extensions.foxsavvy.ShowDown" type="bool"/>
+      <preference id="ShowDownPredicted" name="extensions.foxsavvy.ShowDownPredicted" type="bool"/>
+      <preference id="ShowUp" name="extensions.foxsavvy.ShowUp" type="bool"/>
+      <preference id="ShowUpPredicted" name="extensions.foxsavvy.ShowUpPredicted" type="bool"/>
+      <preference id="ShowTotal" name="extensions.foxsavvy.ShowTotal" type="bool"/>
+      <preference id="ShowTotalPredicted" name="extensions.foxsavvy.ShowTotalPredicted" type="bool"/>
+      <preference id="ShowISP" name="extensions.foxsavvy.ShowISP" type="bool"/>
+      <preference id="ShowStatusbar" name="extensions.foxsavvy.ShowStatusbar" type="bool"/>
     </preferences>
     <label accesskey="&APIKey.accesskey;" control="txtAPIKey">&APIKey.label;</label><textbox id="txtAPIKey" preference="APIKey"/>
+    <checkbox id="chkShowDown" preference="ShowDown" label="&ShowDown.label;"/>
+    <checkbox id="chkShowDownPredicted" preference="ShowDownPredicted" label="&ShowDownPredicted.label;"/>
+    <checkbox id="chkShowUp" preference="ShowUp" label="&ShowUp.label;"/>
+    <checkbox id="chkShowUpPredicted" preference="ShowUpPredicted" label="&ShowUpPredicted.label;"/>
+    <checkbox id="chkShowTotal" preference="ShowTotal" label="&ShowTotal.label;"/>
+    <checkbox id="chkShowTotalPredicted" preference="ShowTotalPredicted" label="&ShowTotalPredicted.label;"/> 
+    <checkbox id="chkShowPeak" preference="ShowPeak" label="&ShowPeak.label;"/>
+    <checkbox id="chkShowISP" preference="ShowISP" label="&ShowISP.label;"/>
+    <checkbox id="chkShowStatusbar" preference="ShowStatusbar" label="&ShowStatusbar.label;"/>
   </prefpane>
 </prefwindow>

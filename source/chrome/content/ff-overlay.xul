@@ -9,21 +9,61 @@
   <toolbox id="navigator-toolbox">
     <toolbar class="chromeclass-toolbar" toolbarname="&foxsavvyToolbar.name;" customizable="true" id="foxsavvy-toolbar">
       <label value="&foxsavvyToolbar.label;" style="color: red; font-weight: bold;"/>
-      <label value="&foxsavvyToolbar.Current;" style="font-weight: bold;"/>
-      <label id="lblCurrentUsageToolbar" value="0 GB"/>
-      <label value="&foxsavvyToolbar.Predicted;" style="font-weight: bold;"/>
-      <label id="lblPredictedUsageToolbar" value="0 GB"/>
-      <label value="&foxsavvyToolbar.ISP;" style="font-weight: bold;"/>
-      <label id="lblISPToolbar" value="&foxsavvyToolbar.ISPText;"/>
+      <div id="pnlDownToolbar">
+        <label value="D:" style="font-weight: bold;"/>
+        <label id="lblDownToolbar" value="0 GB"/>
+      </div>
+      <div id="pnlDownPredictedToolbar">
+        <label value="DP:" style="font-weight: bold;"/>
+        <label id="lblDownPredictedToolbar" value="0 GB"/>
+      </div>
+      <div id="pnlUpToolbar">
+        <label value="U:" style="font-weight: bold;"/>
+        <label id="lblUpToolbar" value="0 GB"/>
+      </div>
+      <div id="pnlUpPredictedToolbar">
+        <label value="UP:" style="font-weight: bold;"/>
+        <label id="lblUpPredictedToolbar" value="0 GB"/>
+      </div>
+      <div id="pnlTotalToolbar">
+        <label value="T:" style="font-weight: bold;"/>
+        <label id="lblTotalToolbar" value="0 GB"/>
+      </div>
+      <div id="pnlTotalPredictedToolbar">
+        <label value="TP:" style="font-weight: bold;"/>
+        <label id="lblTotalPredictedToolbar" value="0 GB"/>
+      </div>
+      <label id="lblISPToolbar" value="&foxsavvyToolbar.ISPDefault;" style="color: red; font-weight: bold;"/>
     </toolbar>
   </toolbox>
   <statusbar id="status-bar">
+    <div id="pnlStatusbar">
       <label value="&foxsavvyToolbar.label;" style="color: red; font-weight: bold;"/>
-      <label value="&foxsavvyToolbar.Current;" style="font-weight: bold;"/>
-      <label id="lblCurrentUsageStatusbar" value="0 GB"/>
-      <label value="&foxsavvyToolbar.Predicted;" style="font-weight: bold;"/>
-      <label id="lblPredictedUsageStatusbar" value="0 GB"/>
-      <label value="&foxsavvyToolbar.ISP;" style="font-weight: bold;"/>
-      <label id="lblISPStatusbar" value="&foxsavvyToolbar.ISPText;"/>
+      <div id="pnlDownStatusbar">
+        <label value="D:" style="font-weight: bold;"/>
+        <label id="lblDownStatusbar" value="0 GB"/>
+      </div>
+      <div id="pnlDownPredictedStatusbar">
+        <label value="DP:" style="font-weight: bold;"/>
+        <label id="lblDownPredictedStatusbar" value="0 GB"/>
+      </div>
+      <div id="pnlUpStatusbar">
+        <label value="U:" style="font-weight: bold;"/>
+        <label id="lblUpStatusbar" value="0 GB"/>
+      </div>
+      <div id="pnlUpPredictedStatusbar">
+        <label value="UP:" style="font-weight: bold;"/>
+        <label id="lblUpPredictedStatusbar" value="0 GB"/>
+      </div>
+      <div id="pnlTotalStatusbar">
+        <label value="T:" style="font-weight: bold;"/>
+        <label id="lblTotalStatusbar" value="0 GB"/>
+      </div>
+      <div id="pnlTotalPredictedStatusbar">
+        <label value="TP:" style="font-weight: bold;"/>
+        <label id="lblTotalPredictedStatusbar" value="0 GB"/>
+      </div>
+      <label id="lblISPStatusbar" value="&foxsavvyToolbar.ISPDefault;" style="color: red; font-weight: bold;"/>
+    </div>
   </statusbar>
 </overlay>

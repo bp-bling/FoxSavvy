@@ -2,3 +2,12 @@
 <!ENTITY pane1.title "FoxSavvy preferences">
 <!ENTITY APIKey.label "Username / API Key">
 <!ENTITY APIKey.accesskey "A">
+<!ENTITY ShowDown.label "Show Download (D)">
+<!ENTITY ShowDownPredicted.label "Show Download Predicted (DP)">
+<!ENTITY ShowUp.label "Show Upload (U)">
+<!ENTITY ShowUpPredicted.label "Show Upload Predicted (UP)">
+<!ENTITY ShowTotal.label "Show Total (T)">
+<!ENTITY ShowTotalPredicted.label "Show Total Predicted (TP)">
+<!ENTITY ShowPeak.label "Show Peak Usage Only">
+<!ENTITY ShowISP.label "Show ISP">
+<!ENTITY ShowStatusbar.label "Show on Status/Addon Bar">
