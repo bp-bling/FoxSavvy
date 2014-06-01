@@ -1,4 +1,4 @@
-var UsageDataDetails = function () {
+var FoxSavvyUsageDataDetails = function () {
   this.Down = 0;
   this.Total = 0;
   this.Up = 0;
@@ -19,137 +19,96 @@ var UsageDataDetails = function () {
   this.DaysInMonth = new Date(new Date().getFullYear(), new Date().getMonth() + 1, 0).getDate();
 };
  
-var UsageData = function () {
-    this.OffPeak = new UsageDataDetails();
-    this.Peak = new UsageDataDetails();
-    this.All = new UsageDataDetails();
+var FoxSavvyUsageData = function () {
+    this.OffPeak = new FoxSavvyUsageDataDetails();
+    this.Peak = new FoxSavvyUsageDataDetails();
+    this.All = new FoxSavvyUsageDataDetails();
 };
 
-var FoxSavvyTimer;
 var FoxSavvy = function () {
   var that = this;
   
   this.onLoad = function() {
     // initialization code
-    this.initialized = true;
-    this.strings = document.getElementById("foxsavvy-strings");
+    that.initialized = true;
+    that.strings = document.getElementById("foxsavvy-strings");
     
     // Listen for preference changes
-    this.prefs = Components.classes["@mozilla.org/preferences-service;1"]
+    that.prefs = Components.classes["@mozilla.org/preferences-service;1"]
          .getService(Components.interfaces.nsIPrefService)
          .getBranch("extensions.foxsavvy.");
-    this.prefs.addObserver("", this, false);
+    that.prefs.addObserver("", this, false);
   };
   
   this.observe = function(subject, topic, data) {
-     if (topic != "nsPref:changed") { return; }
+    if (topic != "nsPref:changed") { return; }
      
-     clearTimeout(FoxSavvyTimer);
-     this.RefreshUsage(data === "APIKey");
+    if (data === "APIKey") {
+        that.RefreshUsage();
+    } else {
+        that.UpdateDisplay();
+    }
   };
   
-  this.RefreshUsage = function(requestFromISP) {
+  this.RefreshUsage = function() {
+    if (that.Interval) {
+        clearInterval(that.Interval);
+        that.Interval = null;
+    } else {
+        // No interval means this function is already executing, so don't run it again
+        return;
+    }
+    
     // Get the Username / API Key preference
     var prefManager = Components.classes['@mozilla.org/preferences-service;1'].getService(Components.interfaces.nsIPrefBranch);
-    this.APIKey = prefManager.getCharPref('extensions.foxsavvy.APIKey').trim();
+    that.APIKey = prefManager.getCharPref('extensions.foxsavvy.APIKey').trim();
 
-    if (requestFromISP) {
-        this.Usage = new UsageData();
+    that.Usage = new FoxSavvyUsageData();
 
-        // Check which ISP we're requesting usage for -- order counts! If one does't match it falls through to the next, teksavvy is the catchall.
-        if (/^[a-z0-9_\-\.]{3,}@(data\.com|ebox\.com|electronicbox\.net|highspeed\.com|internet\.com|ppp\.com|www\.com)$/.test(this.APIKey)) { 
-            this.ISP = 'Electronicbox Residential DSL';
-        } else if (/^[a-z0-9_\-\.]{3,}@ebox-business\.com$/.test(this.APIKey)) { 
-            this.ISP = 'Electronicbox Business DSL';
-        } else if (/^vl[a-z]{6}$/.test(this.APIKey)) {
-            this.ISP = 'Videotron TPIA';
-        } else if (/^[1-9]\d{4}$/.test(this.APIKey)) {
-            // Valid logins are [a-z0-9]{3,20}@caneris (no .com on the end), but usage is retrieved by 5 digit account number.
-            this.ISP = 'Caneris DSL'; 
-        } else if (/^[A-Z0-9]{7}[A-F0-9]{11}D@(start\.ca)$/.test(this.APIKey)) {
-            this.ISP = 'Start DSL';
-            this.RefreshUsageStart();
-        } else if (/^[A-Z0-9]{7}[A-F0-9]{11}C@(start\.ca)$/.test(this.APIKey)) {
-            this.ISP = 'Start Cable';
-            this.RefreshUsageStart();
-        } else if (/^[A-Z0-9]{7}[A-F0-9]{11}W@(start\.ca)$/.test(this.APIKey)) {
-            this.ISP = 'Start Wireless';
-            this.RefreshUsageStart();
-        } else if (/^[A-Z0-9]{7}[A-F0-9]{11}D@(logins\.ca)$/.test(this.APIKey)) {
-            this.ISP = 'Start Wholesale DSL';
-            this.RefreshUsageStart();
-        } else if (/^[A-Z0-9]{7}[A-F0-9]{11}C@(logins\.ca)$/.test(this.APIKey)) {
-            this.ISP = 'Start Wholesale Cable';
-            this.RefreshUsageStart();
-        } else if (/^[A-Z0-9]{7}[A-F0-9]{11}W@(logins\.ca)$/.test(this.APIKey)) {
-            this.ISP = 'Start Wholesale Wireless';
-            this.RefreshUsageStart();
-        } else if (/^([0-9A-F]{32})(|@teksavvy.com)(|\+[0-9]{1,4})$/.test(this.APIKey)) {
-            this.ISP = 'TekSavvy';
-            this.RefreshUsageTekSavvy();
-        } else {
-            // TODO What happens if the user doesn't show the ISP?  They won't know there's a problem
-            // TODO Maybe force show the ISP on error?  Or hide the labels and show an error message?
-            // TODO Can't show a popup, because it'll show with every keypress in the API textbox
-            this.ISP = 'Invalid Username / API Key';
-        }
-
-        this.Usage.All.Down = this.Usage.Peak.Down + this.Usage.OffPeak.Down;
-        this.Usage.All.Total = this.Usage.Peak.Total + this.Usage.OffPeak.Total;
-        this.Usage.All.Up = this.Usage.Peak.Up + this.Usage.OffPeak.Up;  
-    }
-
-    // Update toolbar labels
-    if (prefManager.getBoolPref('extensions.foxsavvy.ShowPeak')) {
-        // Displaying Peak in labels
-        document.getElementById('lblDownToolbar').value = parseFloat(this.Usage.Peak.Down).toFixed(2) + ' GB';
-        document.getElementById('lblDownPredictedToolbar').value = parseFloat(this.Usage.Peak.DownPredicted).toFixed(2) + ' GB';
-        document.getElementById('lblUpToolbar').value = parseFloat(this.Usage.Peak.Up).toFixed(2) + ' GB';
-        document.getElementById('lblUpPredictedToolbar').value = parseFloat(this.Usage.Peak.UpPredicted).toFixed(2) + ' GB';
-        document.getElementById('lblTotalToolbar').value = parseFloat(this.Usage.Peak.Total).toFixed(2) + ' GB';
-        document.getElementById('lblTotalPredictedToolbar').value = parseFloat(this.Usage.Peak.TotalPredicted).toFixed(2) + ' GB';
-        document.getElementById('lblISPToolbar').value = this.ISP;
+    // Check which ISP we're requesting usage for -- order counts! If one does't match it falls through to the next, teksavvy is the catchall.
+    if (/^[a-z0-9_\-\.]{3,}@(data\.com|ebox\.com|electronicbox\.net|highspeed\.com|internet\.com|ppp\.com|www\.com)$/.test(that.APIKey)) { 
+        that.ISP = 'Electronicbox Residential DSL';
+    } else if (/^[a-z0-9_\-\.]{3,}@ebox-business\.com$/.test(that.APIKey)) { 
+        that.ISP = 'Electronicbox Business DSL';
+    } else if (/^vl[a-z]{6}$/.test(that.APIKey)) {
+        that.ISP = 'Videotron TPIA';
+    } else if (/^[1-9]\d{4}$/.test(that.APIKey)) {
+        // Valid logins are [a-z0-9]{3,20}@caneris (no .com on the end), but usage is retrieved by 5 digit account number.
+        that.ISP = 'Caneris DSL'; 
+    } else if (/^[A-Z0-9]{7}[A-F0-9]{11}D@(start\.ca)$/.test(that.APIKey)) {
+        that.ISP = 'Start DSL';
+        that.RefreshUsageStart();
+    } else if (/^[A-Z0-9]{7}[A-F0-9]{11}C@(start\.ca)$/.test(that.APIKey)) {
+        that.ISP = 'Start Cable';
+        that.RefreshUsageStart();
+    } else if (/^[A-Z0-9]{7}[A-F0-9]{11}W@(start\.ca)$/.test(that.APIKey)) {
+        that.ISP = 'Start Wireless';
+        that.RefreshUsageStart();
+    } else if (/^[A-Z0-9]{7}[A-F0-9]{11}D@(logins\.ca)$/.test(that.APIKey)) {
+        that.ISP = 'Start Wholesale DSL';
+        that.RefreshUsageStart();
+    } else if (/^[A-Z0-9]{7}[A-F0-9]{11}C@(logins\.ca)$/.test(that.APIKey)) {
+        that.ISP = 'Start Wholesale Cable';
+        that.RefreshUsageStart();
+    } else if (/^[A-Z0-9]{7}[A-F0-9]{11}W@(logins\.ca)$/.test(that.APIKey)) {
+        that.ISP = 'Start Wholesale Wireless';
+        that.RefreshUsageStart();
+    } else if (/^([0-9A-F]{32})(|@teksavvy.com)(|\+[0-9]{1,4})$/.test(that.APIKey)) {
+        that.ISP = 'TekSavvy';
+        that.RefreshUsageTekSavvy();
     } else {
-        // Displaying All (Peak + Off-Peak) in labels
-        document.getElementById('lblDownToolbar').value = parseFloat(this.Usage.All.Down).toFixed(2) + ' GB';
-        document.getElementById('lblDownPredictedToolbar').value = parseFloat(this.Usage.All.DownPredicted).toFixed(2) + ' GB';
-        document.getElementById('lblUpToolbar').value = parseFloat(this.Usage.All.Up).toFixed(2) + ' GB';
-        document.getElementById('lblUpPredictedToolbar').value = parseFloat(this.Usage.All.UpPredicted).toFixed(2) + ' GB';
-        document.getElementById('lblTotalToolbar').value = parseFloat(this.Usage.All.Total).toFixed(2) + ' GB';
-        document.getElementById('lblTotalPredictedToolbar').value = parseFloat(this.Usage.All.TotalPredicted).toFixed(2) + ' GB';
-        document.getElementById('lblISPToolbar').value = this.ISP;
+        // TODO What happens if the user doesn't show the ISP?  They won't know there's a problem
+        // TODO Maybe force show the ISP on error?  Or hide the labels and show an error message?
+        // TODO Can't show a popup, because it'll show with every keypress in the API textbox
+        that.ISP = 'Invalid Username / API Key';
     }
-    
-    // Update statusbar labels
-    document.getElementById('lblDownStatusbar').value = document.getElementById('lblDownToolbar').value;
-    document.getElementById('lblDownPredictedStatusbar').value = document.getElementById('lblDownPredictedToolbar').value;
-    document.getElementById('lblUpStatusbar').value = document.getElementById('lblUpToolbar').value;
-    document.getElementById('lblUpPredictedStatusbar').value = document.getElementById('lblUpPredictedToolbar').value;
-    document.getElementById('lblTotalStatusbar').value = document.getElementById('lblTotalToolbar').value;
-    document.getElementById('lblTotalPredictedStatusbar').value = document.getElementById('lblTotalPredictedToolbar').value;
-    document.getElementById('lblISPStatusbar').value = document.getElementById('lblISPToolbar').value;
-    
-    // Update visibility of toolbar
-    document.getElementById('pnlDownToolbar').style.display = (prefManager.getBoolPref('extensions.foxsavvy.ShowDown')) ? 'inline-block' : 'none';
-    document.getElementById('pnlDownPredictedToolbar').style.display = (prefManager.getBoolPref('extensions.foxsavvy.ShowDownPredicted')) ? 'inline-block' : 'none';
-    document.getElementById('pnlUpToolbar').style.display = (prefManager.getBoolPref('extensions.foxsavvy.ShowUp')) ? 'inline-block' : 'none';
-    document.getElementById('pnlUpPredictedToolbar').style.display = (prefManager.getBoolPref('extensions.foxsavvy.ShowUpPredicted')) ? 'inline-block' : 'none';
-    document.getElementById('pnlTotalToolbar').style.display = (prefManager.getBoolPref('extensions.foxsavvy.ShowTotal')) ? 'inline-block' : 'none';
-    document.getElementById('pnlTotalPredictedToolbar').style.display = (prefManager.getBoolPref('extensions.foxsavvy.ShowTotalPredicted')) ? 'inline-block' : 'none';
-    document.getElementById('lblISPToolbar').style.display = (prefManager.getBoolPref('extensions.foxsavvy.ShowISP')) ? 'inline-block' : 'none';
-    
-    // Update visibility of statusbar
-    document.getElementById('pnlStatusbar').style.display = (prefManager.getBoolPref('extensions.foxsavvy.ShowStatusbar')) ? 'block' : 'none';
-    document.getElementById('pnlDownStatusbar').style.display = document.getElementById('pnlDownToolbar').style.display;
-    document.getElementById('pnlDownPredictedStatusbar').style.display = document.getElementById('pnlDownPredictedToolbar').style.display;
-    document.getElementById('pnlUpStatusbar').style.display = document.getElementById('pnlUpToolbar').style.display;
-    document.getElementById('pnlUpPredictedStatusbar').style.display = document.getElementById('pnlUpPredictedToolbar').style.display;
-    document.getElementById('pnlTotalStatusbar').style.display = document.getElementById('pnlTotalToolbar').style.display;
-    document.getElementById('pnlTotalPredictedStatusbar').style.display = document.getElementById('pnlTotalPredictedToolbar').style.display;
-    document.getElementById('lblISPStatusbar').style.display = document.getElementById('lblISPToolbar').style.display;
-    
+
+    that.Usage.All.Down = that.Usage.Peak.Down + that.Usage.OffPeak.Down;
+    that.Usage.All.Total = that.Usage.Peak.Total + that.Usage.OffPeak.Total;
+    that.Usage.All.Up = that.Usage.Peak.Up + that.Usage.OffPeak.Up;  
+
     // TODO Maybe colour FoxSavvy label based on success?  Green is OK, Red is error?
-    FoxSavvyTimer = setTimeout("foxsavvy.RefreshUsage(true);", 30 * 60 * 1000); // 30 minutes
+    that.Interval = setInterval(function () { that.RefreshUsage(); }, 30 * 60 * 1000); // 30 minutes
   };
   
   this.RefreshUsageStart = function() {
@@ -171,12 +130,14 @@ var FoxSavvy = function () {
                 case 'ULFREE': that.Usage.OffPeak.Up = parseInt(KeyValue[1]) / OneGig; break;
             }
         }
+        
+        that.UpdateDisplay();
     };
     xhr.onerror = function () {
         var promptService = Components.classes['@mozilla.org/embedcomp/prompt-service;1'].getService(Components.interfaces.nsIPromptService);
         promptService.alert(window, 'FoxSavvy', 'Error retrieving usage information from your ISP:\n' + that.ISP);
     };
-    xhr.open('GET', 'http://www.start.ca/support/capsavvy?code=' + this.APIKey, false);
+    xhr.open('GET', 'http://www.start.ca/support/capsavvy?code=' + that.APIKey, true);
     xhr.send(null);
   };
   
@@ -208,18 +169,73 @@ var FoxSavvy = function () {
             that.Usage.OffPeak.Total += (that.Usage.OffPeak.Down + that.Usage.OffPeak.Up);
           }
         }
+
+        that.UpdateDisplay();
     };
     xhr.onerror = function () {
         var promptService = Components.classes['@mozilla.org/embedcomp/prompt-service;1'].getService(Components.interfaces.nsIPromptService);
         promptService.alert(window, 'FoxSavvy', 'Error retrieving usage information from your ISP:\n' + that.ISP);
     };
-    xhr.open('GET', 'https://api.teksavvy.com/web/Usage/UsageSummaryRecords?$filter=IsCurrent%20eq%20true', false);
-    xhr.setRequestHeader('TekSavvy-APIKey', this.APIKey);
+    xhr.open('GET', 'https://api.teksavvy.com/web/Usage/UsageSummaryRecords?$filter=IsCurrent%20eq%20true', true);
+    xhr.setRequestHeader('TekSavvy-APIKey', that.APIKey);
     xhr.send(null);
+  };
+
+  this.UpdateDisplay = function() {
+    var prefManager = Components.classes['@mozilla.org/preferences-service;1'].getService(Components.interfaces.nsIPrefBranch);
+
+    // Update toolbar labels
+    if (prefManager.getBoolPref('extensions.foxsavvy.ShowPeak')) {
+        // Displaying Peak in labels
+        document.getElementById('lblDownToolbar').value = parseFloat(that.Usage.Peak.Down).toFixed(2) + ' GB';
+        document.getElementById('lblDownPredictedToolbar').value = parseFloat(that.Usage.Peak.DownPredicted).toFixed(2) + ' GB';
+        document.getElementById('lblUpToolbar').value = parseFloat(that.Usage.Peak.Up).toFixed(2) + ' GB';
+        document.getElementById('lblUpPredictedToolbar').value = parseFloat(that.Usage.Peak.UpPredicted).toFixed(2) + ' GB';
+        document.getElementById('lblTotalToolbar').value = parseFloat(that.Usage.Peak.Total).toFixed(2) + ' GB';
+        document.getElementById('lblTotalPredictedToolbar').value = parseFloat(that.Usage.Peak.TotalPredicted).toFixed(2) + ' GB';
+        document.getElementById('lblISPToolbar').value = that.ISP;
+    } else {
+        // Displaying All (Peak + Off-Peak) in labels
+        document.getElementById('lblDownToolbar').value = parseFloat(that.Usage.All.Down).toFixed(2) + ' GB';
+        document.getElementById('lblDownPredictedToolbar').value = parseFloat(that.Usage.All.DownPredicted).toFixed(2) + ' GB';
+        document.getElementById('lblUpToolbar').value = parseFloat(that.Usage.All.Up).toFixed(2) + ' GB';
+        document.getElementById('lblUpPredictedToolbar').value = parseFloat(that.Usage.All.UpPredicted).toFixed(2) + ' GB';
+        document.getElementById('lblTotalToolbar').value = parseFloat(that.Usage.All.Total).toFixed(2) + ' GB';
+        document.getElementById('lblTotalPredictedToolbar').value = parseFloat(that.Usage.All.TotalPredicted).toFixed(2) + ' GB';
+        document.getElementById('lblISPToolbar').value = that.ISP;
+    }
+    
+    // Update statusbar labels
+    document.getElementById('lblDownStatusbar').value = document.getElementById('lblDownToolbar').value;
+    document.getElementById('lblDownPredictedStatusbar').value = document.getElementById('lblDownPredictedToolbar').value;
+    document.getElementById('lblUpStatusbar').value = document.getElementById('lblUpToolbar').value;
+    document.getElementById('lblUpPredictedStatusbar').value = document.getElementById('lblUpPredictedToolbar').value;
+    document.getElementById('lblTotalStatusbar').value = document.getElementById('lblTotalToolbar').value;
+    document.getElementById('lblTotalPredictedStatusbar').value = document.getElementById('lblTotalPredictedToolbar').value;
+    document.getElementById('lblISPStatusbar').value = document.getElementById('lblISPToolbar').value;
+    
+    // Update visibility of toolbar
+    document.getElementById('pnlDownToolbar').style.display = (prefManager.getBoolPref('extensions.foxsavvy.ShowDown')) ? 'inline-block' : 'none';
+    document.getElementById('pnlDownPredictedToolbar').style.display = (prefManager.getBoolPref('extensions.foxsavvy.ShowDownPredicted')) ? 'inline-block' : 'none';
+    document.getElementById('pnlUpToolbar').style.display = (prefManager.getBoolPref('extensions.foxsavvy.ShowUp')) ? 'inline-block' : 'none';
+    document.getElementById('pnlUpPredictedToolbar').style.display = (prefManager.getBoolPref('extensions.foxsavvy.ShowUpPredicted')) ? 'inline-block' : 'none';
+    document.getElementById('pnlTotalToolbar').style.display = (prefManager.getBoolPref('extensions.foxsavvy.ShowTotal')) ? 'inline-block' : 'none';
+    document.getElementById('pnlTotalPredictedToolbar').style.display = (prefManager.getBoolPref('extensions.foxsavvy.ShowTotalPredicted')) ? 'inline-block' : 'none';
+    document.getElementById('lblISPToolbar').style.display = (prefManager.getBoolPref('extensions.foxsavvy.ShowISP')) ? 'inline-block' : 'none';
+    
+    // Update visibility of statusbar
+    document.getElementById('pnlStatusbar').style.display = (prefManager.getBoolPref('extensions.foxsavvy.ShowStatusbar')) ? 'block' : 'none';
+    document.getElementById('pnlDownStatusbar').style.display = document.getElementById('pnlDownToolbar').style.display;
+    document.getElementById('pnlDownPredictedStatusbar').style.display = document.getElementById('pnlDownPredictedToolbar').style.display;
+    document.getElementById('pnlUpStatusbar').style.display = document.getElementById('pnlUpToolbar').style.display;
+    document.getElementById('pnlUpPredictedStatusbar').style.display = document.getElementById('pnlUpPredictedToolbar').style.display;
+    document.getElementById('pnlTotalStatusbar').style.display = document.getElementById('pnlTotalToolbar').style.display;
+    document.getElementById('pnlTotalPredictedStatusbar').style.display = document.getElementById('pnlTotalPredictedToolbar').style.display;
+    document.getElementById('lblISPStatusbar').style.display = document.getElementById('lblISPToolbar').style.display;
   };
 };
 var foxsavvy = new FoxSavvy();
 
 window.addEventListener("load", function () { foxsavvy.onLoad(); }, false);
 
-FoxSavvyTimer = setTimeout("foxsavvy.RefreshUsage(true);", 1000);
+foxsavvy.Interval = setInterval(function () { foxsavvy.RefreshUsage(); }, 1000);
