@@ -1,28 +1,36 @@
-var FoxSavvyUsageDataDetails = function () {
+var FoxSavvyUsageDataDetails = function (usageIsRealTime) {
   this.Down = 0;
   this.Total = 0;
   this.Up = 0;
   
   this.__defineGetter__("DownPredicted", function () {
-    return this.Down == 0 || this.DayNumber == 1 ? 0 : this.Down / parseInt(this.DayNumber - 1) * this.DaysInMonth;
+    return ((this.Down == 0) || ((this.DayOfMonth == 1) && !this.UsageIsRealTime)) ? 0 : this.Down / (this.DayOfMonth - 1 + this.TodayFraction) * this.DaysInMonth;
   });
   
   this.__defineGetter__("UpPredicted", function () {
-    return this.Up == 0 || this.DayNumber == 1 ? 0 : this.Up / parseInt(this.DayNumber - 1) * this.DaysInMonth;
+    return ((this.Up == 0) || ((this.DayOfMonth == 1) && !this.UsageIsRealTime)) ? 0 : this.Up / (this.DayOfMonth - 1 + this.TodayFraction) * this.DaysInMonth;
   });
 
   this.__defineGetter__("TotalPredicted", function () {
-    return this.Total == 0 || this.DayNumber == 1 ? 0 : this.Total / parseInt(this.DayNumber - 1) * this.DaysInMonth;
+    return ((this.Total == 0) || ((this.DayOfMonth == 1) && !this.UsageIsRealTime)) ? 0 : this.Total / (this.DayOfMonth - 1 + this.TodayFraction) * this.DaysInMonth;
   });
   
-  this.DayNumber = new Date().getDate();
-  this.DaysInMonth = new Date(new Date().getFullYear(), new Date().getMonth() + 1, 0).getDate();
+  // Constructor
+  this.UsageIsRealTime = usageIsRealTime;
+
+  // Values we'll use in prediction calculations
+  this.Date = new Date();
+  this.DayOfMonth = this.Date.getDate();
+  this.HourOfDay = this.Date.getHours();
+  this.MinuteOfHour = this.Date.getMinutes();
+  this.DaysInMonth = new Date(this.Date.getFullYear(), this.Date.getMonth() + 1, 0).getDate();
+  this.TodayFraction = this.UsageIsRealTime ? (this.HourOfDay / 24) + (this.MinuteOfHour / 1440) : 0;
 };
  
-var FoxSavvyUsageData = function () {
-    this.OffPeak = new FoxSavvyUsageDataDetails();
-    this.Peak = new FoxSavvyUsageDataDetails();
-    this.All = new FoxSavvyUsageDataDetails();
+var FoxSavvyUsageData = function (usageIsRealTime) {
+    this.OffPeak = new FoxSavvyUsageDataDetails(usageIsRealTime);
+    this.Peak = new FoxSavvyUsageDataDetails(usageIsRealTime);
+    this.All = new FoxSavvyUsageDataDetails(usageIsRealTime);
 };
 
 var FoxSavvy = function () {
@@ -63,18 +71,20 @@ var FoxSavvy = function () {
     var prefManager = Components.classes['@mozilla.org/preferences-service;1'].getService(Components.interfaces.nsIPrefBranch);
     that.APIKey = prefManager.getCharPref('extensions.foxsavvy.APIKey').trim();
 
-    that.Usage = new FoxSavvyUsageData();
-
     // Check which ISP we're requesting usage for -- order counts! If one does't match it falls through to the next, teksavvy is the catchall.
     if (/^[a-z0-9_\-\.]{3,}@(data\.com|ebox\.com|electronicbox\.net|highspeed\.com|internet\.com|ppp\.com|www\.com)$/.test(that.APIKey)) { 
         that.ISP = 'Electronicbox Residential DSL';
+        that.Usage = new FoxSavvyUsageData(false); // TODO Confirm whether this is realtime usage data or not
     } else if (/^[a-z0-9_\-\.]{3,}@ebox-business\.com$/.test(that.APIKey)) { 
         that.ISP = 'Electronicbox Business DSL';
+        that.Usage = new FoxSavvyUsageData(false); // TODO Confirm whether this is realtime usage data or not
     } else if (/^vl[a-z]{6}$/.test(that.APIKey)) {
         that.ISP = 'Videotron TPIA';
+        that.Usage = new FoxSavvyUsageData(false); // TODO Confirm whether this is realtime usage data or not
     } else if (/^[1-9]\d{4}$/.test(that.APIKey)) {
         // Valid logins are [a-z0-9]{3,20}@caneris (no .com on the end), but usage is retrieved by 5 digit account number.
         that.ISP = 'Caneris DSL'; 
+        that.Usage = new FoxSavvyUsageData(false); // TODO Confirm whether this is realtime usage data or not
     } else if (/^[A-Z0-9]{7}[A-F0-9]{11}D@(start\.ca)$/.test(that.APIKey)) {
         that.ISP = 'Start DSL';
         that.RefreshUsageStart();
@@ -101,6 +111,7 @@ var FoxSavvy = function () {
         // TODO Maybe force show the ISP on error?  Or hide the labels and show an error message?
         // TODO Can't show a popup, because it'll show with every keypress in the API textbox
         that.ISP = 'Invalid Username / API Key';
+        that.Usage = new FoxSavvyUsageData(false); // TODO Confirm whether this is realtime usage data or not
     }
 
     that.Usage.All.Down = that.Usage.Peak.Down + that.Usage.OffPeak.Down;
@@ -112,6 +123,8 @@ var FoxSavvy = function () {
   };
   
   this.RefreshUsageStart = function() {
+    that.Usage = new FoxSavvyUsageData(true);
+
     var xhr = new XMLHttpRequest();
     xhr.onload = function () {
         var OneGig = 1000 * 1000 * 1000; // This is how the Start usage checker does it
@@ -142,6 +155,8 @@ var FoxSavvy = function () {
   };
   
   this.RefreshUsageTekSavvy = function() {
+    that.Usage = new FoxSavvyUsageData(false); // TODO Confirm whether this is realtime usage data or not
+
     var xhr = new XMLHttpRequest();
     xhr.onload = function () {
         var Data = JSON.parse(this.responseText);
@@ -187,21 +202,21 @@ var FoxSavvy = function () {
     // Update toolbar labels
     if (prefManager.getBoolPref('extensions.foxsavvy.ShowPeak')) {
         // Displaying Peak in labels
-        document.getElementById('lblDownToolbar').value = parseFloat(that.Usage.Peak.Down).toFixed(2) + ' GB';
-        document.getElementById('lblDownPredictedToolbar').value = parseFloat(that.Usage.Peak.DownPredicted).toFixed(2) + ' GB';
-        document.getElementById('lblUpToolbar').value = parseFloat(that.Usage.Peak.Up).toFixed(2) + ' GB';
-        document.getElementById('lblUpPredictedToolbar').value = parseFloat(that.Usage.Peak.UpPredicted).toFixed(2) + ' GB';
-        document.getElementById('lblTotalToolbar').value = parseFloat(that.Usage.Peak.Total).toFixed(2) + ' GB';
-        document.getElementById('lblTotalPredictedToolbar').value = parseFloat(that.Usage.Peak.TotalPredicted).toFixed(2) + ' GB';
+        document.getElementById('lblDownToolbar').value = parseFloat(that.Usage.Peak.Down).toFixed(1) + ' GB';
+        document.getElementById('lblDownPredictedToolbar').value = parseFloat(that.Usage.Peak.DownPredicted).toFixed(1) + ' GB';
+        document.getElementById('lblUpToolbar').value = parseFloat(that.Usage.Peak.Up).toFixed(1) + ' GB';
+        document.getElementById('lblUpPredictedToolbar').value = parseFloat(that.Usage.Peak.UpPredicted).toFixed(1) + ' GB';
+        document.getElementById('lblTotalToolbar').value = parseFloat(that.Usage.Peak.Total).toFixed(1) + ' GB';
+        document.getElementById('lblTotalPredictedToolbar').value = parseFloat(that.Usage.Peak.TotalPredicted).toFixed(1) + ' GB';
         document.getElementById('lblISPToolbar').value = that.ISP;
     } else {
         // Displaying All (Peak + Off-Peak) in labels
-        document.getElementById('lblDownToolbar').value = parseFloat(that.Usage.All.Down).toFixed(2) + ' GB';
-        document.getElementById('lblDownPredictedToolbar').value = parseFloat(that.Usage.All.DownPredicted).toFixed(2) + ' GB';
-        document.getElementById('lblUpToolbar').value = parseFloat(that.Usage.All.Up).toFixed(2) + ' GB';
-        document.getElementById('lblUpPredictedToolbar').value = parseFloat(that.Usage.All.UpPredicted).toFixed(2) + ' GB';
-        document.getElementById('lblTotalToolbar').value = parseFloat(that.Usage.All.Total).toFixed(2) + ' GB';
-        document.getElementById('lblTotalPredictedToolbar').value = parseFloat(that.Usage.All.TotalPredicted).toFixed(2) + ' GB';
+        document.getElementById('lblDownToolbar').value = parseFloat(that.Usage.All.Down).toFixed(1) + ' GB';
+        document.getElementById('lblDownPredictedToolbar').value = parseFloat(that.Usage.All.DownPredicted).toFixed(1) + ' GB';
+        document.getElementById('lblUpToolbar').value = parseFloat(that.Usage.All.Up).toFixed(1) + ' GB';
+        document.getElementById('lblUpPredictedToolbar').value = parseFloat(that.Usage.All.UpPredicted).toFixed(1) + ' GB';
+        document.getElementById('lblTotalToolbar').value = parseFloat(that.Usage.All.Total).toFixed(1) + ' GB';
+        document.getElementById('lblTotalPredictedToolbar').value = parseFloat(that.Usage.All.TotalPredicted).toFixed(1) + ' GB';
         document.getElementById('lblISPToolbar').value = that.ISP;
     }
     
