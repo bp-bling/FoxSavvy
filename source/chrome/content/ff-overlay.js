@@ -1,3 +1,18 @@
+// TODO List:
+// From bbbc
+//   Percentage of cap used
+//     Which means need an option to input cap size
+//   Colours to indicate where you are with usage
+//     Allow customization of colour and threshold for OK, warning, danger, and over
+//   Zap The Cap (ZTC) indicator - Ø over the percentage used? [what's this mean?]
+//     Maybe change colour when ZTC is in effect, to indicate the slow down is in effect?
+//       Maybe add inputs for normal and ZTC speed, and have that as a label that changes as ZTC status changes?
+//   Click on numerical percentage to get more detailed info [click anywhere for a popup?]
+//   Works with various Canadian providers [will implement what CapSavvy has, needs people to volunteer codes to actually test though]
+//   Perhaps the color or icon could change when unlimited bandwidth is free, the witching hours of 2 a.m. to 8 a.m.
+//     Need an option for start/end of unlimited period
+//   Another idea, would be support for two different ISPs. As an example, maybe someone has TSI Cable and TSI DSL as a backup.
+
 var FoxSavvyUsageDataDetails = function (usageIsRealTime) {
   this.Down = 0;
   this.Total = 0;
