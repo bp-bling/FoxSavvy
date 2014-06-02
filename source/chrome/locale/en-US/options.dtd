@@ -3,8 +3,7 @@
 <!ENTITY CapType.label "Cap Type">
 <!ENTITY CapTypeDown.label "Downloads Only">
 <!ENTITY CapTypeTotal.label "Downloads + Uploads">
-<!ENTITY ShowFoxSavvyHeader.label "Show FoxSavvy Header">
-<!ENTITY FoxSavvyHeaderColour.label "FoxSavvy Header Colour">
+<!ENTITY IncludePeakOnly.label "Include Peak Usage Only">
 <!ENTITY ShowDown.label "Show Download (D)">
 <!ENTITY ShowDownPredicted.label "Show Download Predicted (DP)">
 <!ENTITY ShowUp.label "Show Upload (U)">
@@ -12,7 +11,13 @@
 <!ENTITY ShowTotal.label "Show Total (T)">
 <!ENTITY ShowTotalPredicted.label "Show Total Predicted (TP)">
 <!ENTITY ShowPercent.label "Show Percentage Of Cap Used">
-<!ENTITY IncludePeakOnly.label "Include Peak Usage Only">
+<!ENTITY UsageCapWarningThreshold.label "Usage Cap Warning Threshold (Percent)">
+<!ENTITY UsageCapWarningColour.label "Usage Cap Warning Colour">
+<!ENTITY UsageCapDangerThreshold.label "Usage Cap Danger Threshold (Percent)">
+<!ENTITY UsageCapDangerColour.label "Usage Cap Danger Colour">
+<!ENTITY UsageCapExceededColour.label "Usage Cap Exceeded Colour">
+<!ENTITY ShowFoxSavvyHeader.label "Show FoxSavvy Header">
+<!ENTITY FoxSavvyHeaderColour.label "FoxSavvy Header Colour">
 <!ENTITY ShowISP.label "Show ISP">
 <!ENTITY ISPColour.label "ISP Colour">
 <!ENTITY ShowStatusbar.label "Show on Status/Addon Bar">

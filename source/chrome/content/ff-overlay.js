@@ -1,7 +1,5 @@
 // TODO List:
 // From bbbc
-//   Colours to indicate where you are with usage
-//     Allow customization of colour and threshold for OK, warning, danger, and over
 //   Zap The Cap (ZTC) indicator - Ø over the percentage used? [what's this mean?]
 //     Maybe change colour when ZTC is in effect, to indicate the slow down is in effect?
 //       Maybe add inputs for normal and ZTC speed, and have that as a label that changes as ZTC status changes?
@@ -243,11 +241,11 @@ var FoxSavvy = function () {
             var UsedPercent = Used / UsageCap * 100.0;
             document.getElementById('lbl' + CapType).value += ' (' + UsedPercent.toFixed(1) + '%)';
             if (UsedPercent >= 100) {
-                document.getElementById('pnl' + CapType).style.backgroundColor = 'red';
-            } else if (UsedPercent >= 90) {
-                document.getElementById('pnl' + CapType).style.backgroundColor = 'orange';
-            } else if (UsedPercent >= 75) {
-                document.getElementById('pnl' + CapType).style.backgroundColor = 'yellow';
+                document.getElementById('pnl' + CapType).style.backgroundColor = prefManager.getCharPref('extensions.foxsavvy.UsageCapExceededColour');
+            } else if (UsedPercent >= prefManager.getIntPref('extensions.foxsavvy.UsageCapDangerThreshold')) {
+                document.getElementById('pnl' + CapType).style.backgroundColor = prefManager.getCharPref('extensions.foxsavvy.UsageCapDangerColour');
+            } else if (UsedPercent >= prefManager.getIntPref('extensions.foxsavvy.UsageCapWarningThreshold')) {
+                document.getElementById('pnl' + CapType).style.backgroundColor = prefManager.getCharPref('extensions.foxsavvy.UsageCapWarningColour');
             } else {
                 document.getElementById('pnl' + CapType).style.backgroundColor = 'transparent';
             }
@@ -256,11 +254,11 @@ var FoxSavvy = function () {
             var UsedPredictedPercent = UsedPredicted / UsageCap * 100.0;
             document.getElementById('lbl' + CapType + 'Predicted').value += ' (' + UsedPredictedPercent.toFixed(1) + '%)';
             if (UsedPredictedPercent >= 100) {
-                document.getElementById('pnl' + CapType + 'Predicted').style.backgroundColor = 'red';
-            } else if (UsedPredictedPercent >= 90) {
-                document.getElementById('pnl' + CapType + 'Predicted').style.backgroundColor = 'orange';
-            } else if (UsedPredictedPercent >= 75) {
-                document.getElementById('pnl' + CapType + 'Predicted').style.backgroundColor = 'yellow';
+                document.getElementById('pnl' + CapType + 'Predicted').style.backgroundColor = prefManager.getCharPref('extensions.foxsavvy.UsageCapExceededColour');
+            } else if (UsedPredictedPercent >= prefManager.getIntPref('extensions.foxsavvy.UsageCapDangerThreshold')) {
+                document.getElementById('pnl' + CapType + 'Predicted').style.backgroundColor = prefManager.getCharPref('extensions.foxsavvy.UsageCapDangerColour');
+            } else if (UsedPredictedPercent >= prefManager.getIntPref('extensions.foxsavvy.UsageCapWarningThreshold')) {
+                document.getElementById('pnl' + CapType + 'Predicted').style.backgroundColor = prefManager.getCharPref('extensions.foxsavvy.UsageCapWarningColour');
             } else {
                 document.getElementById('pnl' + CapType + 'Predicted').style.backgroundColor = 'transparent';
             }
