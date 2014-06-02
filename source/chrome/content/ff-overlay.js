@@ -237,16 +237,32 @@ var FoxSavvy = function () {
     if (prefManager.getBoolPref('extensions.foxsavvy.ShowPercent')) {
         var UsageCap = prefManager.getIntPref('extensions.foxsavvy.UsageCap');
         if (UsageCap > 0) {
-            var CapTypeControl = null;
-            switch (prefManager.getCharPref('extensions.foxsavvy.CapType')) {
-                case 'Down': CapTypeControl = 'lblDown'; break;
-                case 'Total': CapTypeControl = 'lblTotal'; break;
+            var CapType = prefManager.getCharPref('extensions.foxsavvy.CapType');
+
+            var Used = parseFloat(document.getElementById('lbl' + CapType).value);
+            var UsedPercent = Used / UsageCap * 100.0;
+            document.getElementById('lbl' + CapType).value += ' (' + UsedPercent.toFixed(1) + '%)';
+            if (UsedPercent >= 100) {
+                document.getElementById('pnl' + CapType).style.backgroundColor = 'red';
+            } else if (UsedPercent >= 90) {
+                document.getElementById('pnl' + CapType).style.backgroundColor = 'orange';
+            } else if (UsedPercent >= 75) {
+                document.getElementById('pnl' + CapType).style.backgroundColor = 'yellow';
+            } else {
+                document.getElementById('pnl' + CapType).style.backgroundColor = 'transparent';
             }
-            if (CapTypeControl != null) {
-                var Used = parseFloat(document.getElementById(CapTypeControl).value);
-                document.getElementById(CapTypeControl).value += ' (' + (Used / UsageCap * 100.0).toFixed(1) + '%)';
-                var UsedPredicted = parseFloat(document.getElementById(CapTypeControl + 'Predicted').value);
-                document.getElementById(CapTypeControl + 'Predicted').value += ' (' + (UsedPredicted / UsageCap * 100.0).toFixed(1) + '%)';
+
+            var UsedPredicted = parseFloat(document.getElementById('lbl' + CapType + 'Predicted').value);
+            var UsedPredictedPercent = UsedPredicted / UsageCap * 100.0;
+            document.getElementById('lbl' + CapType + 'Predicted').value += ' (' + UsedPredictedPercent.toFixed(1) + '%)';
+            if (UsedPredictedPercent >= 100) {
+                document.getElementById('pnl' + CapType + 'Predicted').style.backgroundColor = 'red';
+            } else if (UsedPredictedPercent >= 90) {
+                document.getElementById('pnl' + CapType + 'Predicted').style.backgroundColor = 'orange';
+            } else if (UsedPredictedPercent >= 75) {
+                document.getElementById('pnl' + CapType + 'Predicted').style.backgroundColor = 'yellow';
+            } else {
+                document.getElementById('pnl' + CapType + 'Predicted').style.backgroundColor = 'transparent';
             }
         }
     }
