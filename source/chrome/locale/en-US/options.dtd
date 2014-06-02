@@ -1,4 +1,8 @@
 <!ENTITY APIKey.label "Username / API Key">
+<!ENTITY UsageCap.label "Usage Cap (in GB, 0 for no cap)">
+<!ENTITY CapType.label "Cap Type">
+<!ENTITY CapTypeDown.label "Downloads Only">
+<!ENTITY CapTypeTotal.label "Downloads + Uploads">
 <!ENTITY ShowFoxSavvyHeader.label "Show FoxSavvy Header">
 <!ENTITY FoxSavvyHeaderColour.label "FoxSavvy Header Colour">
 <!ENTITY ShowDown.label "Show Download (D)">
@@ -7,7 +11,8 @@
 <!ENTITY ShowUpPredicted.label "Show Upload Predicted (UP)">
 <!ENTITY ShowTotal.label "Show Total (T)">
 <!ENTITY ShowTotalPredicted.label "Show Total Predicted (TP)">
-<!ENTITY ShowPeak.label "Show Peak Usage Only">
+<!ENTITY ShowPercent.label "Show Percentage Of Cap Used">
+<!ENTITY IncludePeakOnly.label "Include Peak Usage Only">
 <!ENTITY ShowISP.label "Show ISP">
 <!ENTITY ISPColour.label "ISP Colour">
 <!ENTITY ShowStatusbar.label "Show on Status/Addon Bar">

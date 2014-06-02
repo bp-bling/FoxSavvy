@@ -211,7 +211,7 @@ var FoxSavvy = function () {
     var prefManager = Components.classes['@mozilla.org/preferences-service;1'].getService(Components.interfaces.nsIPrefBranch);
 
     // Update toolbar labels
-    if (prefManager.getBoolPref('extensions.foxsavvy.ShowPeak')) {
+    if (prefManager.getBoolPref('extensions.foxsavvy.IncludePeakOnly')) {
         // Displaying Peak in labels
         document.getElementById('lblDown').value = parseFloat(that.Usage.Peak.Down).toFixed(1) + ' GB';
         document.getElementById('lblDownPredicted').value = parseFloat(that.Usage.Peak.DownPredicted).toFixed(1) + ' GB';
@@ -233,6 +233,24 @@ var FoxSavvy = function () {
         document.getElementById('lblTotal').value = parseFloat(that.Usage.All.Total).toFixed(1) + ' GB';
         document.getElementById('lblTotalPredicted').value = parseFloat(that.Usage.All.TotalPredicted).toFixed(1) + ' GB';
         document.getElementById('lblISP').value = that.ISP;
+    }
+    
+    // Update percent (if necessary)
+    if (prefManager.getBoolPref('extensions.foxsavvy.ShowPercent')) {
+        var UsageCap = prefManager.getIntPref('extensions.foxsavvy.UsageCap');
+        if (UsageCap > 0) {
+            var CapTypeControl = null;
+            switch (prefManager.getCharPref('extensions.foxsavvy.CapType')) {
+                case 'Down': CapTypeControl = 'lblDown'; break;
+                case 'Total': CapTypeControl = 'lblTotal'; break;
+            }
+            if (CapTypeControl != null) {
+                var Used = parseFloat(document.getElementById(CapTypeControl).value);
+                document.getElementById(CapTypeControl).value += ' (' + (Used / UsageCap * 100.0).toFixed(1) + '%)';
+                var UsedPredicted = parseFloat(document.getElementById(CapTypeControl + 'Predicted').value);
+                document.getElementById(CapTypeControl + 'Predicted').value += ' (' + (UsedPredicted / UsageCap * 100.0).toFixed(1) + '%)';
+            }
+        }
     }
 
     // Update visibility of toolbar elements

@@ -4,6 +4,8 @@
 // These are here as an example only. Please remove them or rename them to
 // something useful.
 pref("extensions.foxsavvy.APIKey", "");
+pref("extensions.foxsavvy.UsageCap", 0);
+pref("extensions.foxsavvy.CapType", "Total");
 pref("extensions.foxsavvy.ShowFoxSavvyHeader", true);
 pref("extensions.foxsavvy.FoxSavvyHeaderColour", "#ff0000");
 pref("extensions.foxsavvy.ShowDown", true);
@@ -12,7 +14,8 @@ pref("extensions.foxsavvy.ShowUp", true);
 pref("extensions.foxsavvy.ShowUpPredicted", true);
 pref("extensions.foxsavvy.ShowTotal", true);
 pref("extensions.foxsavvy.ShowTotalPredicted", true);
-pref("extensions.foxsavvy.ShowPeak", true);
+pref("extensions.foxsavvy.ShowPercent", true);
+pref("extensions.foxsavvy.IncludePeakOnly", true);
 pref("extensions.foxsavvy.ShowISP", true);
 pref("extensions.foxsavvy.ISPColour", "#ff0000");
 pref("extensions.foxsavvy.ShowStatusbar", true);

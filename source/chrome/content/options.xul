@@ -4,6 +4,13 @@
  
 <vbox xmlns="http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul">
   <setting pref="extensions.foxsavvy.APIKey" type="string" title="&APIKey.label;"/>
+  <setting pref="extensions.foxsavvy.UsageCap" type="integer" title="&UsageCap.label;"/>
+  <setting pref="extensions.foxsavvy.CapType" type="radio" title="&CapType.label;">
+    <radiogroup>
+      <radio value="Down" label="&CapTypeDown.label;"/>
+      <radio value="Total" label="&CapTypeTotal.label;"/>
+    </radiogroup>
+  </setting>
   <setting pref="extensions.foxsavvy.ShowFoxSavvyHeader" type="bool" title="&ShowFoxSavvyHeader.label;"/>
   <setting pref="extensions.foxsavvy.FoxSavvyHeaderColour" type="color" title="&FoxSavvyHeaderColour.label;"/>
   <setting pref="extensions.foxsavvy.ShowDown" type="bool" title="&ShowDown.label;"/>
@@ -12,7 +19,8 @@
   <setting pref="extensions.foxsavvy.ShowUpPredicted" type="bool" title="&ShowUpPredicted.label;"/>
   <setting pref="extensions.foxsavvy.ShowTotal" type="bool" title="&ShowTotal.label;"/>
   <setting pref="extensions.foxsavvy.ShowTotalPredicted" type="bool" title="&ShowTotalPredicted.label;"/>
-  <setting pref="extensions.foxsavvy.ShowPeak" type="bool" title="&ShowPeak.label;"/>
+  <setting pref="extensions.foxsavvy.ShowPercent" type="bool" title="&ShowPercent.label;"/>
+  <setting pref="extensions.foxsavvy.IncludePeakOnly" type="bool" title="&IncludePeakOnly.label;"/>
   <setting pref="extensions.foxsavvy.ShowISP" type="bool" title="&ShowISP.label;"/>
   <setting pref="extensions.foxsavvy.ISPColour" type="color" title="&ISPColour.label;"/>
   <setting pref="extensions.foxsavvy.ShowStatusbar" type="bool" title="&ShowStatusbar.label;"/>
