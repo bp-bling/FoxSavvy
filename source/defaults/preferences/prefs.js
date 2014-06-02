@@ -4,6 +4,8 @@
 // These are here as an example only. Please remove them or rename them to
 // something useful.
 pref("extensions.foxsavvy.APIKey", "");
+pref("extensions.foxsavvy.ShowFoxSavvyHeader", true);
+pref("extensions.foxsavvy.FoxSavvyHeaderColour", "#ff0000");
 pref("extensions.foxsavvy.ShowDown", true);
 pref("extensions.foxsavvy.ShowDownPredicted", true);
 pref("extensions.foxsavvy.ShowUp", true);
@@ -12,6 +14,7 @@ pref("extensions.foxsavvy.ShowTotal", true);
 pref("extensions.foxsavvy.ShowTotalPredicted", true);
 pref("extensions.foxsavvy.ShowPeak", true);
 pref("extensions.foxsavvy.ShowISP", true);
+pref("extensions.foxsavvy.ISPColour", "#ff0000");
 pref("extensions.foxsavvy.ShowStatusbar", true);
 
 // https://developer.mozilla.org/en/Localizing_extension_descriptions

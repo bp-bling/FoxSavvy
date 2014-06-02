@@ -114,10 +114,6 @@ var FoxSavvy = function () {
         that.Usage = new FoxSavvyUsageData(false); // TODO Confirm whether this is realtime usage data or not
     }
 
-    that.Usage.All.Down = that.Usage.Peak.Down + that.Usage.OffPeak.Down;
-    that.Usage.All.Total = that.Usage.Peak.Total + that.Usage.OffPeak.Total;
-    that.Usage.All.Up = that.Usage.Peak.Up + that.Usage.OffPeak.Up;  
-
     // TODO Maybe colour FoxSavvy label based on success?  Green is OK, Red is error?
     that.Interval = setInterval(function () { that.RefreshUsage(); }, 30 * 60 * 1000); // 30 minutes
   };
@@ -202,51 +198,42 @@ var FoxSavvy = function () {
     // Update toolbar labels
     if (prefManager.getBoolPref('extensions.foxsavvy.ShowPeak')) {
         // Displaying Peak in labels
-        document.getElementById('lblDownToolbar').value = parseFloat(that.Usage.Peak.Down).toFixed(1) + ' GB';
-        document.getElementById('lblDownPredictedToolbar').value = parseFloat(that.Usage.Peak.DownPredicted).toFixed(1) + ' GB';
-        document.getElementById('lblUpToolbar').value = parseFloat(that.Usage.Peak.Up).toFixed(1) + ' GB';
-        document.getElementById('lblUpPredictedToolbar').value = parseFloat(that.Usage.Peak.UpPredicted).toFixed(1) + ' GB';
-        document.getElementById('lblTotalToolbar').value = parseFloat(that.Usage.Peak.Total).toFixed(1) + ' GB';
-        document.getElementById('lblTotalPredictedToolbar').value = parseFloat(that.Usage.Peak.TotalPredicted).toFixed(1) + ' GB';
-        document.getElementById('lblISPToolbar').value = that.ISP;
+        document.getElementById('lblDown').value = parseFloat(that.Usage.Peak.Down).toFixed(1) + ' GB';
+        document.getElementById('lblDownPredicted').value = parseFloat(that.Usage.Peak.DownPredicted).toFixed(1) + ' GB';
+        document.getElementById('lblUp').value = parseFloat(that.Usage.Peak.Up).toFixed(1) + ' GB';
+        document.getElementById('lblUpPredicted').value = parseFloat(that.Usage.Peak.UpPredicted).toFixed(1) + ' GB';
+        document.getElementById('lblTotal').value = parseFloat(that.Usage.Peak.Total).toFixed(1) + ' GB';
+        document.getElementById('lblTotalPredicted').value = parseFloat(that.Usage.Peak.TotalPredicted).toFixed(1) + ' GB';
+        document.getElementById('lblISP').value = that.ISP;
     } else {
         // Displaying All (Peak + Off-Peak) in labels
-        document.getElementById('lblDownToolbar').value = parseFloat(that.Usage.All.Down).toFixed(1) + ' GB';
-        document.getElementById('lblDownPredictedToolbar').value = parseFloat(that.Usage.All.DownPredicted).toFixed(1) + ' GB';
-        document.getElementById('lblUpToolbar').value = parseFloat(that.Usage.All.Up).toFixed(1) + ' GB';
-        document.getElementById('lblUpPredictedToolbar').value = parseFloat(that.Usage.All.UpPredicted).toFixed(1) + ' GB';
-        document.getElementById('lblTotalToolbar').value = parseFloat(that.Usage.All.Total).toFixed(1) + ' GB';
-        document.getElementById('lblTotalPredictedToolbar').value = parseFloat(that.Usage.All.TotalPredicted).toFixed(1) + ' GB';
-        document.getElementById('lblISPToolbar').value = that.ISP;
+        that.Usage.All.Down = that.Usage.Peak.Down + that.Usage.OffPeak.Down;
+        that.Usage.All.Total = that.Usage.Peak.Total + that.Usage.OffPeak.Total;
+        that.Usage.All.Up = that.Usage.Peak.Up + that.Usage.OffPeak.Up;  
+
+        document.getElementById('lblDown').value = parseFloat(that.Usage.All.Down).toFixed(1) + ' GB';
+        document.getElementById('lblDownPredicted').value = parseFloat(that.Usage.All.DownPredicted).toFixed(1) + ' GB';
+        document.getElementById('lblUp').value = parseFloat(that.Usage.All.Up).toFixed(1) + ' GB';
+        document.getElementById('lblUpPredicted').value = parseFloat(that.Usage.All.UpPredicted).toFixed(1) + ' GB';
+        document.getElementById('lblTotal').value = parseFloat(that.Usage.All.Total).toFixed(1) + ' GB';
+        document.getElementById('lblTotalPredicted').value = parseFloat(that.Usage.All.TotalPredicted).toFixed(1) + ' GB';
+        document.getElementById('lblISP').value = that.ISP;
     }
+
+    // Update visibility of toolbar elements
+    document.getElementById('lblFoxSavvy').style.color = prefManager.getCharPref('extensions.foxsavvy.FoxSavvyHeaderColour');
+    document.getElementById('lblFoxSavvy').style.display = (prefManager.getBoolPref('extensions.foxsavvy.ShowFoxSavvyHeader')) ? 'inline-block' : 'none';
+    document.getElementById('pnlDown').style.display = (prefManager.getBoolPref('extensions.foxsavvy.ShowDown')) ? 'inline-block' : 'none';
+    document.getElementById('pnlDownPredicted').style.display = (prefManager.getBoolPref('extensions.foxsavvy.ShowDownPredicted')) ? 'inline-block' : 'none';
+    document.getElementById('pnlUp').style.display = (prefManager.getBoolPref('extensions.foxsavvy.ShowUp')) ? 'inline-block' : 'none';
+    document.getElementById('pnlUpPredicted').style.display = (prefManager.getBoolPref('extensions.foxsavvy.ShowUpPredicted')) ? 'inline-block' : 'none';
+    document.getElementById('pnlTotal').style.display = (prefManager.getBoolPref('extensions.foxsavvy.ShowTotal')) ? 'inline-block' : 'none';
+    document.getElementById('pnlTotalPredicted').style.display = (prefManager.getBoolPref('extensions.foxsavvy.ShowTotalPredicted')) ? 'inline-block' : 'none';
+    document.getElementById('lblISP').style.color = prefManager.getCharPref('extensions.foxsavvy.ISPColour');
+    document.getElementById('lblISP').style.display = (prefManager.getBoolPref('extensions.foxsavvy.ShowISP')) ? 'inline-block' : 'none';
     
-    // Update statusbar labels
-    document.getElementById('lblDownStatusbar').value = document.getElementById('lblDownToolbar').value;
-    document.getElementById('lblDownPredictedStatusbar').value = document.getElementById('lblDownPredictedToolbar').value;
-    document.getElementById('lblUpStatusbar').value = document.getElementById('lblUpToolbar').value;
-    document.getElementById('lblUpPredictedStatusbar').value = document.getElementById('lblUpPredictedToolbar').value;
-    document.getElementById('lblTotalStatusbar').value = document.getElementById('lblTotalToolbar').value;
-    document.getElementById('lblTotalPredictedStatusbar').value = document.getElementById('lblTotalPredictedToolbar').value;
-    document.getElementById('lblISPStatusbar').value = document.getElementById('lblISPToolbar').value;
-    
-    // Update visibility of toolbar
-    document.getElementById('pnlDownToolbar').style.display = (prefManager.getBoolPref('extensions.foxsavvy.ShowDown')) ? 'inline-block' : 'none';
-    document.getElementById('pnlDownPredictedToolbar').style.display = (prefManager.getBoolPref('extensions.foxsavvy.ShowDownPredicted')) ? 'inline-block' : 'none';
-    document.getElementById('pnlUpToolbar').style.display = (prefManager.getBoolPref('extensions.foxsavvy.ShowUp')) ? 'inline-block' : 'none';
-    document.getElementById('pnlUpPredictedToolbar').style.display = (prefManager.getBoolPref('extensions.foxsavvy.ShowUpPredicted')) ? 'inline-block' : 'none';
-    document.getElementById('pnlTotalToolbar').style.display = (prefManager.getBoolPref('extensions.foxsavvy.ShowTotal')) ? 'inline-block' : 'none';
-    document.getElementById('pnlTotalPredictedToolbar').style.display = (prefManager.getBoolPref('extensions.foxsavvy.ShowTotalPredicted')) ? 'inline-block' : 'none';
-    document.getElementById('lblISPToolbar').style.display = (prefManager.getBoolPref('extensions.foxsavvy.ShowISP')) ? 'inline-block' : 'none';
-    
-    // Update visibility of statusbar
-    document.getElementById('pnlStatusbar').style.display = (prefManager.getBoolPref('extensions.foxsavvy.ShowStatusbar')) ? 'block' : 'none';
-    document.getElementById('pnlDownStatusbar').style.display = document.getElementById('pnlDownToolbar').style.display;
-    document.getElementById('pnlDownPredictedStatusbar').style.display = document.getElementById('pnlDownPredictedToolbar').style.display;
-    document.getElementById('pnlUpStatusbar').style.display = document.getElementById('pnlUpToolbar').style.display;
-    document.getElementById('pnlUpPredictedStatusbar').style.display = document.getElementById('pnlUpPredictedToolbar').style.display;
-    document.getElementById('pnlTotalStatusbar').style.display = document.getElementById('pnlTotalToolbar').style.display;
-    document.getElementById('pnlTotalPredictedStatusbar').style.display = document.getElementById('pnlTotalPredictedToolbar').style.display;
-    document.getElementById('lblISPStatusbar').style.display = document.getElementById('lblISPToolbar').style.display;
+    // Update statusbar
+    document.getElementById('pnlStatusbar').innerHTML = document.getElementById('foxsavvy-toolbar').innerHTML;// = (prefManager.getBoolPref('extensions.foxsavvy.ShowStatusbar')) ? 'block' : 'none';
   };
 };
 var foxsavvy = new FoxSavvy();

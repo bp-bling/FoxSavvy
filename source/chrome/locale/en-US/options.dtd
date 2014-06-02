@@ -1,4 +1,6 @@
 <!ENTITY APIKey.label "Username / API Key">
+<!ENTITY ShowFoxSavvyHeader.label "Show FoxSavvy Header">
+<!ENTITY FoxSavvyHeaderColour.label "FoxSavvy Header Colour">
 <!ENTITY ShowDown.label "Show Download (D)">
 <!ENTITY ShowDownPredicted.label "Show Download Predicted (DP)">
 <!ENTITY ShowUp.label "Show Upload (U)">
@@ -7,4 +9,5 @@
 <!ENTITY ShowTotalPredicted.label "Show Total Predicted (TP)">
 <!ENTITY ShowPeak.label "Show Peak Usage Only">
 <!ENTITY ShowISP.label "Show ISP">
+<!ENTITY ISPColour.label "ISP Colour">
 <!ENTITY ShowStatusbar.label "Show on Status/Addon Bar">
