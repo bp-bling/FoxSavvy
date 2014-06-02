@@ -1,7 +1,5 @@
 // TODO List:
 // From bbbc
-//   Percentage of cap used
-//     Which means need an option to input cap size
 //   Colours to indicate where you are with usage
 //     Allow customization of colour and threshold for OK, warning, danger, and over
 //   Zap The Cap (ZTC) indicator - Ø over the percentage used? [what's this mean?]
