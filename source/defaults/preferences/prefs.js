@@ -3,6 +3,9 @@
 
 // These are here as an example only. Please remove them or rename them to
 // something useful.
+pref("extensions.foxsavvy.LastUsage", "");
+pref("extensions.foxsavvy.LastUsageTime", "0");
+
 pref("extensions.foxsavvy.APIKey", "");
 pref("extensions.foxsavvy.UsageCap", 0);
 pref("extensions.foxsavvy.CapType", "Total");

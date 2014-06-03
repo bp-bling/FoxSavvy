@@ -11,6 +11,7 @@
 
 var FoxSavvyUsageDataDetails = function (usageIsRealTime) {
   this.Down = 0;
+  this.ISP = "Unknown";
   this.Total = 0;
   this.Up = 0;
   
@@ -46,6 +47,23 @@ var FoxSavvyUsageData = function (usageIsRealTime) {
 
 var FoxSavvy = function () {
   var that = this;
+  
+  this.Init = function() {
+    // Cancel init timer
+    clearInterval(that.Interval);
+    
+    // Start refresh timer
+    that.Interval = setInterval(function () { that.RefreshUsage(); }, 30 * 60 * 1000); // 30 minutes
+    
+    // Check if we should do a startup refresh (if data is old)
+    var prefManager = Components.classes['@mozilla.org/preferences-service;1'].getService(Components.interfaces.nsIPrefBranch);
+    if (((new Date()).getTime() - parseFloat(prefManager.getCharPref("extensions.foxsavvy.LastUsageTime"))) < 5 * 60 * 1000) {
+        that.Usage = JSON.parse(prefManager.getCharPref("extensions.foxsavvy.LastUsage"));
+        that.UpdateDisplay();
+    } else {
+        that.RefreshUsage();
+    }
+  }
   
   this.onLoad = function() {
     // initialization code
@@ -84,54 +102,56 @@ var FoxSavvy = function () {
 
     // Check which ISP we're requesting usage for -- order counts! If one does't match it falls through to the next, teksavvy is the catchall.
     if (/^[a-z0-9_\-\.]{3,}@(data\.com|ebox\.com|electronicbox\.net|highspeed\.com|internet\.com|ppp\.com|www\.com)$/.test(that.APIKey)) { 
-        that.ISP = 'Electronicbox Residential DSL';
         that.Usage = new FoxSavvyUsageData(false); // TODO Confirm whether this is realtime usage data or not
+        that.Usage.ISP = 'Electronicbox Residential DSL';
     } else if (/^[a-z0-9_\-\.]{3,}@ebox-business\.com$/.test(that.APIKey)) { 
-        that.ISP = 'Electronicbox Business DSL';
         that.Usage = new FoxSavvyUsageData(false); // TODO Confirm whether this is realtime usage data or not
+        that.Usage.ISP = 'Electronicbox Business DSL';
     } else if (/^vl[a-z]{6}$/.test(that.APIKey)) {
-        that.ISP = 'Videotron TPIA';
         that.Usage = new FoxSavvyUsageData(false); // TODO Confirm whether this is realtime usage data or not
+        that.Usage.ISP = 'Videotron TPIA';
     } else if (/^[1-9]\d{4}$/.test(that.APIKey)) {
         // Valid logins are [a-z0-9]{3,20}@caneris (no .com on the end), but usage is retrieved by 5 digit account number.
-        that.ISP = 'Caneris DSL'; 
         that.Usage = new FoxSavvyUsageData(false); // TODO Confirm whether this is realtime usage data or not
+        that.Usage.ISP = 'Caneris DSL'; 
     } else if (/^[A-Z0-9]{7}[A-F0-9]{11}D@(start\.ca)$/.test(that.APIKey)) {
-        that.ISP = 'Start DSL';
+        that.Usage = new FoxSavvyUsageData(true);
+        that.Usage.ISP = 'Start DSL';
         that.RefreshUsageStart();
     } else if (/^[A-Z0-9]{7}[A-F0-9]{11}C@(start\.ca)$/.test(that.APIKey)) {
-        that.ISP = 'Start Cable';
+        that.Usage = new FoxSavvyUsageData(true);
+        that.Usage.ISP = 'Start Cable';
         that.RefreshUsageStart();
     } else if (/^[A-Z0-9]{7}[A-F0-9]{11}W@(start\.ca)$/.test(that.APIKey)) {
-        that.ISP = 'Start Wireless';
+        that.Usage = new FoxSavvyUsageData(true);
+        that.Usage.ISP = 'Start Wireless';
         that.RefreshUsageStart();
     } else if (/^[A-Z0-9]{7}[A-F0-9]{11}D@(logins\.ca)$/.test(that.APIKey)) {
-        that.ISP = 'Start Wholesale DSL';
+        that.Usage = new FoxSavvyUsageData(true);
+        that.Usage.ISP = 'Start Wholesale DSL';
         that.RefreshUsageStart();
     } else if (/^[A-Z0-9]{7}[A-F0-9]{11}C@(logins\.ca)$/.test(that.APIKey)) {
-        that.ISP = 'Start Wholesale Cable';
+        that.Usage = new FoxSavvyUsageData(true);
+        that.Usage.ISP = 'Start Wholesale Cable';
         that.RefreshUsageStart();
     } else if (/^[A-Z0-9]{7}[A-F0-9]{11}W@(logins\.ca)$/.test(that.APIKey)) {
-        that.ISP = 'Start Wholesale Wireless';
+        that.Usage = new FoxSavvyUsageData(true);
+        that.Usage.ISP = 'Start Wholesale Wireless';
         that.RefreshUsageStart();
     } else if (/^([0-9A-F]{32})(|@teksavvy.com)(|\+[0-9]{1,4})$/.test(that.APIKey)) {
-        that.ISP = 'TekSavvy';
+        that.Usage = new FoxSavvyUsageData(false); // TODO Confirm whether this is realtime usage data or not
+        that.Usage.ISP = 'TekSavvy';
         that.RefreshUsageTekSavvy();
     } else {
         // TODO What happens if the user doesn't show the ISP?  They won't know there's a problem
         // TODO Maybe force show the ISP on error?  Or hide the labels and show an error message?
         // TODO Can't show a popup, because it'll show with every keypress in the API textbox
-        that.ISP = 'Invalid Username / API Key';
         that.Usage = new FoxSavvyUsageData(false); // TODO Confirm whether this is realtime usage data or not
+        that.Usage.ISP = 'Invalid Username / API Key';
     }
-
-    // TODO Maybe colour FoxSavvy label based on success?  Green is OK, Red is error?
-    that.Interval = setInterval(function () { that.RefreshUsage(); }, 30 * 60 * 1000); // 30 minutes
   };
   
   this.RefreshUsageStart = function() {
-    that.Usage = new FoxSavvyUsageData(true);
-
     var xhr = new XMLHttpRequest();
     xhr.onload = function () {
         var OneGig = 1000 * 1000 * 1000; // This is how the Start usage checker does it
@@ -151,19 +171,27 @@ var FoxSavvy = function () {
             }
         }
         
+        that.Usage.All.Down = that.Usage.Peak.Down + that.Usage.OffPeak.Down;
+        that.Usage.All.Total = that.Usage.Peak.Total + that.Usage.OffPeak.Total;
+        that.Usage.All.Up = that.Usage.Peak.Up + that.Usage.OffPeak.Up;  
+
+        // Store retrieved data
+        var prefManager = Components.classes['@mozilla.org/preferences-service;1'].getService(Components.interfaces.nsIPrefBranch);
+        prefManager.setCharPref("extensions.foxsavvy.LastUsage", JSON.stringify(that.Usage));
+        prefManager.setCharPref("extensions.foxsavvy.LastUsageTime", (new Date()).getTime());
+
+        // Update display
         that.UpdateDisplay();
     };
     xhr.onerror = function () {
         var promptService = Components.classes['@mozilla.org/embedcomp/prompt-service;1'].getService(Components.interfaces.nsIPromptService);
-        promptService.alert(window, 'FoxSavvy', 'Error retrieving usage information from your ISP:\n' + that.ISP);
+        promptService.alert(window, 'FoxSavvy', 'Error retrieving usage information from your ISP:\n' + that.Usage.ISP);
     };
     xhr.open('GET', 'http://www.start.ca/support/capsavvy?code=' + that.APIKey, true);
     xhr.send(null);
   };
   
   this.RefreshUsageTekSavvy = function() {
-    that.Usage = new FoxSavvyUsageData(false); // TODO Confirm whether this is realtime usage data or not
-
     var xhr = new XMLHttpRequest();
     xhr.onload = function () {
         var Data = JSON.parse(this.responseText);
@@ -190,13 +218,23 @@ var FoxSavvy = function () {
             that.Usage.OffPeak.Up += Data.value[i].OffPeakUpload;
             that.Usage.OffPeak.Total += (that.Usage.OffPeak.Down + that.Usage.OffPeak.Up);
           }
+      
+          that.Usage.All.Down = that.Usage.Peak.Down + that.Usage.OffPeak.Down;
+          that.Usage.All.Total = that.Usage.Peak.Total + that.Usage.OffPeak.Total;
+          that.Usage.All.Up = that.Usage.Peak.Up + that.Usage.OffPeak.Up;  
         }
 
+        // Store retrieved data
+        var prefManager = Components.classes['@mozilla.org/preferences-service;1'].getService(Components.interfaces.nsIPrefBranch);
+        prefManager.setCharPref("extensions.foxsavvy.LastUsage", JSON.stringify(that.Usage));
+        prefManager.setCharPref("extensions.foxsavvy.LastUsageTime", (new Date()).getTime());
+
+        // Update display
         that.UpdateDisplay();
     };
     xhr.onerror = function () {
         var promptService = Components.classes['@mozilla.org/embedcomp/prompt-service;1'].getService(Components.interfaces.nsIPromptService);
-        promptService.alert(window, 'FoxSavvy', 'Error retrieving usage information from your ISP:\n' + that.ISP);
+        promptService.alert(window, 'FoxSavvy', 'Error retrieving usage information from your ISP:\n' + that.Usage.ISP);
     };
     xhr.open('GET', 'https://api.teksavvy.com/web/Usage/UsageSummaryRecords?$filter=IsCurrent%20eq%20true', true);
     xhr.setRequestHeader('TekSavvy-APIKey', that.APIKey);
@@ -215,20 +253,16 @@ var FoxSavvy = function () {
         document.getElementById('lblUpPredicted').value = parseFloat(that.Usage.Peak.UpPredicted).toFixed(1) + ' GB';
         document.getElementById('lblTotal').value = parseFloat(that.Usage.Peak.Total).toFixed(1) + ' GB';
         document.getElementById('lblTotalPredicted').value = parseFloat(that.Usage.Peak.TotalPredicted).toFixed(1) + ' GB';
-        document.getElementById('lblISP').value = that.ISP;
+        document.getElementById('lblISP').value = that.Usage.ISP;
     } else {
         // Displaying All (Peak + Off-Peak) in labels
-        that.Usage.All.Down = that.Usage.Peak.Down + that.Usage.OffPeak.Down;
-        that.Usage.All.Total = that.Usage.Peak.Total + that.Usage.OffPeak.Total;
-        that.Usage.All.Up = that.Usage.Peak.Up + that.Usage.OffPeak.Up;  
-
         document.getElementById('lblDown').value = parseFloat(that.Usage.All.Down).toFixed(1) + ' GB';
         document.getElementById('lblDownPredicted').value = parseFloat(that.Usage.All.DownPredicted).toFixed(1) + ' GB';
         document.getElementById('lblUp').value = parseFloat(that.Usage.All.Up).toFixed(1) + ' GB';
         document.getElementById('lblUpPredicted').value = parseFloat(that.Usage.All.UpPredicted).toFixed(1) + ' GB';
         document.getElementById('lblTotal').value = parseFloat(that.Usage.All.Total).toFixed(1) + ' GB';
         document.getElementById('lblTotalPredicted').value = parseFloat(that.Usage.All.TotalPredicted).toFixed(1) + ' GB';
-        document.getElementById('lblISP').value = that.ISP;
+        document.getElementById('lblISP').value = that.Usage.ISP;
     }
     
     // Update percent (if necessary)
@@ -285,4 +319,4 @@ var foxsavvy = new FoxSavvy();
 
 window.addEventListener("load", function () { foxsavvy.onLoad(); }, false);
 
-foxsavvy.Interval = setInterval(function () { foxsavvy.RefreshUsage(); }, 1000);
+foxsavvy.Interval = setInterval(function () { foxsavvy.Init(); }, 1000);
