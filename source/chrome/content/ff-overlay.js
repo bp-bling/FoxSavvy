@@ -149,6 +149,9 @@ var FoxSavvy = function () {
         that.Usage = new FoxSavvyUsageData(false); // TODO Confirm whether this is realtime usage data or not
         that.Usage.ISP = 'Invalid Username / API Key';
     }
+
+    // Restart refresh timer
+    that.Interval = setInterval(function () { that.RefreshUsage(); }, 30 * 60 * 1000); // 30 minutes
   };
   
   this.RefreshUsageStart = function() {
